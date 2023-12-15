@@ -40,10 +40,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import scala.Option;
-import scala.collection.Seq;
 import scala.collection.immutable.HashMap;
 import scala.collection.immutable.Map;
-import scala.collection.immutable.Seq$;
 
 public class CreateReplaceDatasetBuilderTest {
 
@@ -68,7 +66,7 @@ public class CreateReplaceDatasetBuilderTest {
           catalog,
           mock(Identifier.class),
           mock(Table.class),
-          (Seq<Attribute>) Seq$.MODULE$.empty());
+          ScalaConversionUtils.<Attribute>asScalaSeqEmpty());
 
   TableSpec tableSpec = mock(TableSpec.class);
 

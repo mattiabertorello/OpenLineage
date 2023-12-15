@@ -1,0 +1,52 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+import groovy.io.FileType
+
+import java.nio.file.Files
+
+
+plugins {
+    id("io.openlineage.common-java-config")
+    id("io.openlineage.print-source-set-configuration")
+    id("io.openlineage.standard-spotless")
+    id("io.freefair.lombok") version "8.4"
+}
+
+lombok {
+    version = "1.18.30"
+}
+
+ext {
+    assertjVersion = "3.25.1"
+    junit5Version = "5.10.1"
+    mockitoVersion = "4.11.0"
+    sparkVersion = "3.1.3"
+    jacksonVersion = "2.15.3"
+    lombokVersion = "1.18.30"
+}
+
+dependencies {
+    implementation(project(":shared"))
+    implementation(project(":spark3"))
+
+    compileOnly("com.databricks:dbutils-api_2.12:0.0.6")
+    compileOnly("io.delta:delta-core_2.12:1.1.0")
+    compileOnly("org.apache.iceberg:iceberg-spark3-runtime:0.13.0")
+    compileOnly("org.apache.spark:spark-core_2.12:${sparkVersion}")
+    compileOnly("org.apache.spark:spark-hive_2.12:${sparkVersion}")
+    compileOnly("org.apache.spark:spark-sql_2.12:${sparkVersion}")
+    compileOnly("org.apache.spark:spark-sql-kafka-0-10_2.12:${sparkVersion}")
+
+    testImplementation("com.databricks:dbutils-api_2.12:0.0.6")
+    testImplementation("io.delta:delta-core_2.12:1.1.0")
+    testImplementation("org.apache.iceberg:iceberg-spark3-runtime:0.13.0")
+    testImplementation("org.apache.spark:spark-core_2.12:${sparkVersion}")
+    testImplementation("org.apache.spark:spark-hive_2.12:${sparkVersion}")
+    testImplementation("org.apache.spark:spark-sql_2.12:${sparkVersion}")
+    testImplementation("org.apache.spark:spark-sql-kafka-0-10_2.12:${sparkVersion}")
+    testImplementation("com.fasterxml.jackson.module:jackson-module-scala_2.12:${jacksonVersion}")
+    testImplementation("org.assertj:assertj-core:${assertjVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter:${junit5Version}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junit5Version}")
+    testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+    testImplementation("org.mockito:mockito-inline:${mockitoVersion}")
+}

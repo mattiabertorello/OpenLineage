@@ -1,144 +1,47 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-import groovy.io.FileType
-
-import java.nio.file.Files
-
-
 plugins {
-    id 'java'
-    id 'java-library'
-    id 'java-test-fixtures'
-    id 'com.diffplug.spotless' version '6.12.0'
-    id "com.adarshr.test-logger" version "3.2.0"
-    id "org.gradle.test-retry" version "1.5.8"
-    id "com.github.johnrengelman.shadow" version "8.1.1"
-    id "pmd"
+    id("io.openlineage.common-java-config")
+    id("io.openlineage.print-source-set-configuration")
+    id("io.openlineage.standard-spotless")
+    id("io.freefair.lombok") version "8.4"
 }
 
-pmd {
-    consoleOutput = true
-    toolVersion = "6.46.0"
-    rulesMinimumPriority = 5
-    ruleSetFiles = rootProject.files("pmd-openlineage.xml")
-    ruleSets = []
-    ignoreFailures = true
+lombok {
+    version = "1.18.30"
 }
-
-pmdMain {
-    dependsOn shadowJar
-    reports {
-        html.required = true
-    }
-}
-
-pmdTest {
-    dependsOn shadowJar
-}
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven {
-        url = 'https://astronomer.jfrog.io/artifactory/maven-public-libs-snapshot'
-    }
-}
-
-archivesBaseName='openlineage-spark-spark2'
 
 ext {
-    assertjVersion = '3.25.1'
-    sparkVersion = '2.4.8'
-    junit5Version = '5.10.1'
-    mockitoVersion = '4.11.0'
-    lombokVersion = '1.18.20'
-    postgresqlVersion = '42.7.1'
+    assertjVersion = "3.25.1"
+    sparkVersion = "2.4.8"
+    junit5Version = "5.10.1"
+    mockitoVersion = "4.11.0"
+    lombokVersion = "1.18.20"
+    postgresqlVersion = "42.7.1"
 }
 
 dependencies {
-    api "io.openlineage:openlineage-java:${project.version}"
-    implementation(project(path: ":shared", configuration: 'shadow'))
+    implementation(project(":shared"))
 
-    compileOnly "com.fasterxml.jackson.module:jackson-module-scala_2.11:2.15.3"
-    compileOnly "org.apache.spark:spark-core_2.11:${sparkVersion}"
-    compileOnly "org.apache.spark:spark-sql_2.11:${sparkVersion}"
-    compileOnly "org.apache.spark:spark-hive_2.11:${sparkVersion}"
-    compileOnly "org.apache.spark:spark-sql-kafka-0-10_2.11:${sparkVersion}"
+    compileOnly("com.fasterxml.jackson.module:jackson-module-scala_2.12:2.15.3")
+    compileOnly("org.apache.spark:spark-sql_2.12:${sparkVersion}")
 
-    compileOnly "com.databricks:dbutils-api_2.11:0.0.5"
-
-    testFixturesApi "org.apache.spark:spark-core_2.11:${sparkVersion}"
-    testFixturesApi "org.apache.spark:spark-sql_2.11:${sparkVersion}"
-    testFixturesApi "org.apache.spark:spark-hive_2.11:${sparkVersion}"
-    testFixturesApi "com.fasterxml.jackson.module:jackson-module-scala_2.11:2.15.3"
-    testFixturesApi "org.apache.spark:spark-sql-kafka-0-10_2.11:${sparkVersion}"
-
-    testFixturesApi "org.junit.jupiter:junit-jupiter:${junit5Version}"
-    testFixturesApi "org.postgresql:postgresql:${postgresqlVersion}"
-    testFixturesApi "org.assertj:assertj-core:${assertjVersion}"
-    testFixturesApi "org.mockito:mockito-core:${mockitoVersion}"
-    testFixturesApi "org.mockito:mockito-inline:${mockitoVersion}"
-    testFixturesApi "org.junit.jupiter:junit-jupiter-api:${junit5Version}"
-    testFixturesApi "org.apache.kafka:kafka-clients:3.6.1"
-    testFixturesApi(project(path: ":shared", configuration: 'shadow'))
+    testImplementation("com.fasterxml.jackson.module:jackson-module-scala_2.12:2.15.3")
+    testImplementation("org.apache.spark:spark-core_2.12:${sparkVersion}")
+    testImplementation("org.apache.spark:spark-sql_2.12:${sparkVersion}")
+    testImplementation("org.apache.spark:spark-hive_2.12:${sparkVersion}")
+    testImplementation("com.fasterxml.jackson.module:jackson-module-scala_2.12:2.15.3")
+    testImplementation("org.assertj:assertj-core:${assertjVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter:${junit5Version}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junit5Version}")
+    testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+    testImplementation("org.mockito:mockito-inline:${mockitoVersion}")
+    testImplementation("org.postgresql:postgresql:${postgresqlVersion}")
 }
 
-def commonTestConfiguration = {
-    forkEvery 1
-    maxParallelForks 5
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
         showStandardStreams = true
-    }
-    systemProperties = [
-            'junit.platform.output.capture.stdout': 'true',
-            'junit.platform.output.capture.stderr': 'true',
-            'spark.version'                       : "${sparkVersion}",
-            'openlineage.spark.jar'               : "${archivesBaseName}-${project.version}.jar",
-            'kafka.package.version'               : "org.apache.spark:spark-sql-kafka-0-10_2.11:${sparkVersion}",
-            'mockserver.logLevel'                 : 'ERROR'
-    ]
-
-    classpath = project.sourceSets.test.runtimeClasspath
-}
-
-test {
-    dependsOn shadowJar
-    configure commonTestConfiguration
-    useJUnitPlatform {
-        excludeTags 'integration-test'
-    }
-}
-
-assemble {
-    dependsOn shadowJar
-}
-
-compileTestJava {
-    dependsOn(':shared:jar')
-}
-
-compileJava {
-    dependsOn(':shared:jar')
-}
-
-shadowJar {
-    minimize()
-    archiveClassifier = ''
-    zip64 true
-}
-
-spotless {
-    def disallowWildcardImports = {
-        String text = it
-        def regex = ~/import .*\.\*;/
-        def m = regex.matcher(text)
-        if (m.find()) {
-            throw new AssertionError("Wildcard imports disallowed - ${m.findAll()}")
-        }
-    }
-    java {
-        googleJavaFormat()
-        removeUnusedImports()
-        custom 'disallowWildcardImports', disallowWildcardImports
     }
 }
