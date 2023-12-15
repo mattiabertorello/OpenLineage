@@ -173,8 +173,7 @@ class RddExecutionContext implements ExecutionContext {
               .replaceAll(CAMEL_TO_SNAKE_CASE, "_$1") // camel case to snake case
               .toLowerCase(Locale.ROOT);
     }
-    Seq<Dependency<?>> deps = (Seq<Dependency<?>>) rdd.dependencies();
-    List<Dependency<?>> dependencies = ScalaConversionUtils.fromSeq(deps);
+    List<Dependency<?>> dependencies = ScalaConversionUtils.fromSeq(rdd.dependencies());
     if (dependencies.isEmpty()) {
       return rddName;
     }

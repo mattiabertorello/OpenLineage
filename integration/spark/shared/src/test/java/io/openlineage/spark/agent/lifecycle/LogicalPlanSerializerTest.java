@@ -64,9 +64,9 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.postgresql.Driver;
 import scala.Option;
-import scala.collection.Seq;
 import scala.collection.immutable.HashMap;
 import scala.collection.immutable.IndexedSeq;
+import scala.collection.immutable.Seq;
 
 class LogicalPlanSerializerTest {
   private static final String TEST_DATA = "test_data";
