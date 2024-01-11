@@ -62,8 +62,7 @@ public class TableContentChangeDatasetBuilder
     } else if (new IcebergHandler(context).hasClasses() && x instanceof ReplaceData) {
       // DELETE FROM on ICEBERG HAS START ELEMENT WITH ReplaceData AND COMPLETE ONE WITH
       // DeleteFromTable
-      // table = ((ReplaceData) x).table();
-      table = null;
+      table = ((ReplaceData) x).table();
     } else if (x instanceof DeleteFromTable) {
       table = (NamedRelation) ((DeleteFromTable) x).table();
     } else if (x instanceof UpdateTable) {

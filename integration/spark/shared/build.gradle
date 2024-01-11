@@ -52,10 +52,10 @@ ext {
     assertjVersion = '3.25.1'
     bigqueryVersion = '0.29.0'
     junit5Version = '5.10.1'
-    sparkVersion = '3.2.2'
-    sparkVersionShort = '3.2'
-    scalaVersion = project.getProperty('scala.binary.version')
-    snowflakeVersion = '2.11.0'
+    sparkVersion = '2.4.8'
+    sparkVersionShort = '2.4'
+    scalaVersion = '2.11'
+    snowflakeVersion = '2.9.3'
     postgresqlVersion = '42.7.1'
     mockitoVersion = '4.11.0'
     testcontainersVersion = '1.19.3'
@@ -80,9 +80,7 @@ dependencies {
 
     compileOnly "org.apache.spark:spark-hive_${scalaVersion}:${sparkVersion}"
     compileOnly "org.apache.spark:spark-sql-kafka-0-10_${scalaVersion}:${sparkVersion}"
-    compileOnly ("com.databricks:databricks-dbutils-scala_${scalaVersion}:0.1.4") {
-        exclude group: 'com.fasterxml.jackson.core'
-    }
+    compileOnly "com.databricks:dbutils-api_${scalaVersion}:0.0.5"
 
     // TODO: those fixtures should be cleaned in future PRs -> integration tests got moved to app
     testFixturesApi platform('org.junit:junit-bom:5.10.1')

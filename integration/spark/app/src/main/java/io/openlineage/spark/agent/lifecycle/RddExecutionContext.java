@@ -58,7 +58,6 @@ import org.apache.spark.scheduler.SparkListenerStageSubmitted;
 import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionEnd;
 import org.apache.spark.sql.execution.ui.SparkListenerSQLExecutionStart;
 import org.apache.spark.util.SerializableJobConf;
-import scala.collection.Seq;
 import scala.runtime.AbstractFunction0;
 
 @Slf4j

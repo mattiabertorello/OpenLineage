@@ -139,17 +139,6 @@ public class ScalaConversionUtils {
   }
 
   /**
-   * Convert a {@link Set} to a Java {@link List}.
-   *
-   * @param set
-   * @param <T>
-   * @return
-   */
-  public static <T> List<T> fromSet(Set<T> set) {
-    return fromSeq(set.toBuffer());
-  }
-
-  /**
    * Convert a {@link scala.collection.immutable.Map} to a Java {@link Map}.
    *
    * @param map

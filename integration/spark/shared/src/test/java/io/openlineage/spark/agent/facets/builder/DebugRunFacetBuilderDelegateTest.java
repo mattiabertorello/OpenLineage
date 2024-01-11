@@ -115,7 +115,7 @@ public class DebugRunFacetBuilderDelegateTest {
     assertThat(facet.getJars()).containsExactly("oneJar");
     assertThat(facet)
         .hasFieldOrPropertyWithValue("sparkVersion", "3.3.0")
-        .hasFieldOrPropertyWithValue("scalaVersion", "2.12.15");
+        .hasFieldOrPropertyWithValue("scalaVersion", "2.11.12");
   }
 
   @Test
