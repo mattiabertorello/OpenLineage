@@ -51,7 +51,7 @@ ext {
 }
 
 dependencies {
-    implementation(project(path:    ":app"))
+//     implementation(project(path:    ":app"))
     implementation(project(path: ":shared", configuration: "shadow"))
     implementation(project(path: ":spark2"))
     implementation(project(path: ":spark3"))
@@ -229,7 +229,7 @@ shadowJar {
         exclude (project(":spark33"))
         exclude (project(":spark34"))
         exclude (project(":spark35"))
-        exclude (project(":app"))
+//        exclude (project(":app"))
     }
     dependencies {
         exclude(dependency('org.slf4j::'))

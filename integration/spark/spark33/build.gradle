@@ -1,17 +1,8 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-import groovy.io.FileType
-
-import java.nio.file.Files
-
-
 plugins {
-    id 'java'
     id 'java-library'
-    id 'java-test-fixtures'
     id 'com.diffplug.spotless' version '6.12.0'
     id "com.adarshr.test-logger" version "3.2.0"
     id "org.gradle.test-retry" version "1.5.8"
-    id "com.github.johnrengelman.shadow" version "8.1.1"
     id "pmd"
 }
 
@@ -25,14 +16,9 @@ pmd {
 }
 
 pmdMain {
-    dependsOn shadowJar
     reports {
         html.required = true
     }
-}
-
-pmdTest {
-    dependsOn shadowJar
 }
 
 repositories {
@@ -43,22 +29,46 @@ repositories {
     }
 }
 
-archivesBaseName='openlineage-spark-spark3'
+archivesBaseName = 'openlineage-spark-spark3'
 
 ext {
     assertjVersion = '3.25.1'
     junit5Version = '5.10.1'
     mockitoVersion = '4.11.0'
-    sparkVersion = '3.3.1'
+    sparkVersion = '3.3.3'
     scalaVersion = project.getProperty('scala.binary.version')
     jacksonVersion = '2.15.3'
     lombokVersion = '1.18.30'
+    icebergVersion = '0.14.1'
 }
 
-configurations.all { // https://github.com/apache/spark/pull/38355 - can be remove for Spark 3.3.2
+configurations.configureEach {
+    // https://github.com/apache/spark/pull/38355 - can be remove for Spark 3.3.2
     resolutionStrategy {
         // https://github.com/FasterXML/jackson-databind/issues/3627
         force "com.fasterxml.jackson:jackson-bom:$jacksonVersion"
+    }
+}
+
+sourceSets {
+    scala213 {
+        java {
+            srcDir("src/main/java")
+        }
+        resources {
+            srcDir("src/main/resources")
+        }
+    }
+
+    scala213Test {
+        java {
+            srcDir("src/test/java")
+            compileClasspath += sourceSets.scala213.output + sourceSets.scala213.compileClasspath
+            runtimeClasspath += sourceSets.scala213.output + sourceSets.scala213.runtimeClasspath
+        }
+        resources {
+            srcDir("src/test/resources")
+        }
     }
 }
 
@@ -68,31 +78,34 @@ dependencies {
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-    implementation(project(path: ":shared", configuration: "shadow"))
-    implementation(project(path: ":spark3", configuration: "shadow"))
+    implementation(project(path: ":shared"))
+    implementation(project(path: ":spark3"))
+    implementation("org.apache.spark:spark-core_2.12:${sparkVersion}")
+    implementation("org.apache.spark:spark-sql_2.12:${sparkVersion}")
+    implementation("org.apache.spark:spark-hive_2.12:${sparkVersion}")
+    implementation("org.apache.spark:spark-sql-kafka-0-10_2.12:${sparkVersion}")
+    implementation("org.apache.iceberg:iceberg-spark-runtime-3.3_2.12:${icebergVersion}")
 
-    compileOnly "org.apache.spark:spark-core_${scalaVersion}:${sparkVersion}"
-    compileOnly "org.apache.spark:spark-sql_${scalaVersion}:${sparkVersion}"
-    compileOnly "org.apache.spark:spark-hive_${scalaVersion}:${sparkVersion}"
-    compileOnly "org.apache.spark:spark-sql-kafka-0-10_${scalaVersion}:${sparkVersion}"
-    compileOnly "org.apache.iceberg:iceberg-spark-runtime-3.3_${scalaVersion}:0.14.1"
-    compileOnly "io.delta:delta-core_${scalaVersion}:2.1.0"
+    testImplementation("org.junit.jupiter:junit-jupiter:${junit5Version}")
+    testImplementation("org.assertj:assertj-core:${assertjVersion}")
+    testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+    testImplementation("org.mockito:mockito-inline:${mockitoVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junit5Version}")
 
-    testFixturesApi "com.fasterxml.jackson.module:jackson-module-scala_${scalaVersion}:${jacksonVersion}"
-    testFixturesApi "org.apache.spark:spark-core_${scalaVersion}:${sparkVersion}"
-    testFixturesApi "org.apache.spark:spark-sql_${scalaVersion}:${sparkVersion}"
-    testFixturesApi "org.apache.spark:spark-hive_${scalaVersion}:${sparkVersion}"
-    testFixturesApi "org.apache.spark:spark-catalyst_${scalaVersion}:${sparkVersion}"
-    testFixturesApi "org.apache.spark:spark-sql-kafka-0-10_${scalaVersion}:${sparkVersion}"
-    testFixturesApi "org.apache.iceberg:iceberg-spark-runtime-3.3_${scalaVersion}:0.14.1"
-    testFixturesApi "io.delta:delta-core_${scalaVersion}:2.1.0"
+    scala213Implementation(project(path: ':shared'))
+    scala213Implementation(project(path: ':spark3'))
+    scala213Implementation("org.projectlombok:lombok:${lombokVersion}")
+    scala213Implementation("org.apache.spark:spark-core_2.13:${sparkVersion}")
+    scala213Implementation("org.apache.spark:spark-sql_2.13:${sparkVersion}")
+    scala213Implementation("org.apache.spark:spark-hive_2.13:${sparkVersion}")
+    scala213Implementation("org.apache.spark:spark-sql-kafka-0-10_2.13:${sparkVersion}")
+    scala213Implementation("org.apache.iceberg:iceberg-spark-runtime-3.3_2.13:${icebergVersion}")
 
-    testFixturesApi "org.junit.jupiter:junit-jupiter:${junit5Version}"
-    testFixturesApi "org.assertj:assertj-core:${assertjVersion}"
-    testFixturesApi "org.mockito:mockito-core:${mockitoVersion}"
-    testFixturesApi "org.mockito:mockito-inline:${mockitoVersion}"
-    testFixturesApi "org.junit.jupiter:junit-jupiter-api:${junit5Version}"
-    testFixturesApi(project(path: ":shared", configuration: 'shadow'))
+    scala213TestImplementation("org.junit.jupiter:junit-jupiter:${junit5Version}")
+    scala213TestImplementation("org.assertj:assertj-core:${assertjVersion}")
+    scala213TestImplementation("org.mockito:mockito-core:${mockitoVersion}")
+    scala213TestImplementation("org.mockito:mockito-inline:${mockitoVersion}")
+    scala213TestImplementation("org.junit.jupiter:junit-jupiter-api:${junit5Version}")
 }
 
 def commonTestConfiguration = {
@@ -103,47 +116,40 @@ def commonTestConfiguration = {
         showStandardStreams = true
     }
     systemProperties = [
-        'junit.platform.output.capture.stdout': 'true',
-        'junit.platform.output.capture.stderr': 'true',
-        'spark.version'                       : "${sparkVersion}",
-        'openlineage.spark.jar'               : "${archivesBaseName}-${project.version}.jar",
-        'kafka.package.version'               : "org.apache.spark:spark-sql-kafka-0-10_${scalaVersion}:${sparkVersion}",
-        'mockserver.logLevel'                 : 'ERROR'
+            'junit.platform.output.capture.stdout': 'true',
+            'junit.platform.output.capture.stderr': 'true',
+            'spark.version'                       : "${sparkVersion}",
+            'openlineage.spark.jar'               : "${archivesBaseName}-${project.version}.jar",
+            'kafka.package.version'               : "org.apache.spark:spark-sql-kafka-0-10_2.12:${sparkVersion}",
+            'mockserver.logLevel'                 : 'ERROR'
     ]
-
-    classpath = project.sourceSets.test.runtimeClasspath
 }
 
-test {
-    dependsOn shadowJar
+tasks.withType(Test).configureEach {
     configure commonTestConfiguration
-    useJUnitPlatform {
-        excludeTags 'integration-test'
-    }
+    useJUnitPlatform()
 }
 
-assemble {
-    dependsOn shadowJar
+tasks.register("testScala213Test", Test) {
+    description = "Runs unit tests using the Apache Spark 3.3.x libraries compiled with Scala 2.13.y"
+    group = "verification"
+    testClassesDirs = sourceSets.scala213Test.output.classesDirs
+    classpath = sourceSets.scala213Test.runtimeClasspath
 }
 
-compileTestJava {
-    dependsOn(':shared:jar')
-    dependsOn(':spark3:jar')
+tasks.withType(JavaCompile).configureEach {
+    // add annotation processor classpath to each java compile task
+    options.annotationProcessorPath = configurations.annotationProcessor
 }
 
-compileJava {
-    dependsOn(':shared:jar')
-    dependsOn(':spark3:jar')
+tasks.register("testAll") {
+    dependsOn(tasks.named("test"), tasks.named("testScala213Test"))
+    description = "Runs all unit tests"
+    group = "verification"
 }
 
-shadowJar {
-    dependsOn(':spark3:shadowJar')
-    minimize()
-    archiveClassifier = ''
-    dependencies {
-        exclude(dependency('org.slf4j::'))
-    }
-    zip64 true
+tasks.build {
+    dependsOn(tasks.named("testAll"))
 }
 
 spotless {
@@ -159,5 +165,20 @@ spotless {
         googleJavaFormat()
         removeUnusedImports()
         custom 'disallowWildcardImports', disallowWildcardImports
+    }
+}
+
+task printSourceSetInformation {
+    doLast {
+        sourceSets.each { srcSet ->
+            println "[" + srcSet.name + "]"
+            print "-->Source directories: " + srcSet.allJava.srcDirs + "\n"
+            print "-->Output directories: " + srcSet.output.classesDirs.files + "\n"
+            print "-->Compile classpath:\n"
+            srcSet.compileClasspath.files.each {
+                print "  " + it.path + "\n"
+            }
+            println ""
+        }
     }
 }

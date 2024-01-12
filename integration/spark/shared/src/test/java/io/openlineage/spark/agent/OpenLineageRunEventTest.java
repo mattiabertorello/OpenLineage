@@ -37,7 +37,7 @@ class OpenLineageRunEventTest {
     OpenLineage ol =
         new OpenLineage(
             new URI(
-                "https://github.com/OpenLineage/OpenLineage/tree/0.2.3-SNAPSHOT/integration/spark"));
+                "https://github.com/OpenLineage/OpenLineage/tree/0.2.3-SNAPSHOT//spark"));
 
     UUID runId = UUID.fromString("5f24c93c-2ce9-49dc-82e7-95ab4915242f");
     OpenLineage.RunFacets runFacets =

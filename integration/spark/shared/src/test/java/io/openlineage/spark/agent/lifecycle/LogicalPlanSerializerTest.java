@@ -5,12 +5,6 @@
 
 package io.openlineage.spark.agent.lifecycle;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.spark.bigquery.BigQueryRelation;
@@ -60,13 +54,18 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StringType$;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.postgresql.Driver;
 import scala.Option;
 import scala.collection.immutable.HashMap;
 import scala.collection.immutable.IndexedSeq;
 import scala.collection.immutable.Seq;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
 
 class LogicalPlanSerializerTest {
   private static final String TEST_DATA = "test_data";
@@ -182,7 +181,7 @@ class LogicalPlanSerializerTest {
     try {
       mapper.readTree(logicalPlanSerializer.serialize(notSerializablePlan));
     } catch (IOException e) {
-      Assert.fail();
+      fail();
     }
   }
 

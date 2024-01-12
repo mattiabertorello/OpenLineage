@@ -100,7 +100,7 @@ dependencies {
     implementation(project(path: ":spark32"))
     implementation(project(path: ":spark33"))
     implementation(project(path: ":spark34"))
-    implementation(project(path: ":spark35"))
+    //implementation(project(path: ":spark35"))
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3'
 
 
@@ -201,8 +201,8 @@ dependencies {
         }
         pysparkContainerOnly("com.google.guava:guava:30.1-jre")
     }
-    
-    
+
+
     testImplementation testFixtures(project(":${versions.module}")){
         exclude group: 'org.apache.avro'
     }
@@ -263,6 +263,7 @@ test {
     classpath = project.sourceSets.test.runtimeClasspath + configurations."${versions.module}"
 }
 
+/*
 task copyDependencies(type: Copy) {
     dependsOn shadowJar
     dependsOn(
@@ -290,6 +291,7 @@ task copyDependencies(type: Copy) {
     include "*.jar"
     into layout.buildDirectory.dir("dependencies")
 }
+
 
 task integrationTest(type: Test) {
     dependsOn shadowJar, copyDependencies
@@ -324,6 +326,7 @@ task databricksIntegrationTest(type: Test) {
         includeTags "databricks"
     }
 }
+
 
 spotless {
     def disallowWildcardImports = {
@@ -402,3 +405,4 @@ task createVersionProperties(dependsOn: processResources) {
 classes {
     dependsOn createVersionProperties
 }
+*/

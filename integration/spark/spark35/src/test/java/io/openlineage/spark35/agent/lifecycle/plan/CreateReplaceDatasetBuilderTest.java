@@ -24,6 +24,7 @@ import java.util.Optional;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalyst.analysis.ResolvedTable;
+import org.apache.spark.sql.catalyst.expressions.Attribute;
 import org.apache.spark.sql.catalyst.plans.logical.CreateTable;
 import org.apache.spark.sql.catalyst.plans.logical.CreateTableAsSelect;
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
@@ -65,7 +66,7 @@ public class CreateReplaceDatasetBuilderTest {
           catalog,
           mock(Identifier.class),
           mock(Table.class),
-          ScalaConversionUtils.asScalaSeqEmpty());
+          ScalaConversionUtils.<Attribute>asScalaSeqEmpty());
 
   TableSpec tableSpec = mock(TableSpec.class);
 
