@@ -5,6 +5,12 @@
 
 package io.openlineage.spark.agent.lifecycle;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.spark.bigquery.BigQueryRelation;
@@ -60,12 +66,6 @@ import scala.Option;
 import scala.collection.immutable.HashMap;
 import scala.collection.immutable.IndexedSeq;
 import scala.collection.immutable.Seq;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
 
 class LogicalPlanSerializerTest {
   private static final String TEST_DATA = "test_data";
